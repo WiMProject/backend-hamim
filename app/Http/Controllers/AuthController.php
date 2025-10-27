@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -60,5 +61,71 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logged out successfully'
         ]);
+    }
+
+    public function googleLogin(Request $request)
+    {
+        $this->validate($request, [
+            'token' => 'required|string'
+        ]);
+
+        try {
+            $googleUser = Socialite::driver('google')->userFromToken($request->token);
+            
+            $user = User::updateOrCreate([
+                'email' => $googleUser->email
+            ], [
+                'name' => $googleUser->name,
+                'google_id' => $googleUser->id,
+                'avatar' => $googleUser->avatar,
+                'email' => $googleUser->email
+            ]);
+
+            $token = $user->createToken('auth-token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Google login successful',
+                'user' => $user,
+                'token' => $token
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Google login failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function facebookLogin(Request $request)
+    {
+        $this->validate($request, [
+            'token' => 'required|string'
+        ]);
+
+        try {
+            $facebookUser = Socialite::driver('facebook')->userFromToken($request->token);
+            
+            $user = User::updateOrCreate([
+                'email' => $facebookUser->email
+            ], [
+                'name' => $facebookUser->name,
+                'facebook_id' => $facebookUser->id,
+                'avatar' => $facebookUser->avatar,
+                'email' => $facebookUser->email
+            ]);
+
+            $token = $user->createToken('auth-token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Facebook login successful',
+                'user' => $user,
+                'token' => $token
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Facebook login failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }
