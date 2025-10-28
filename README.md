@@ -2,7 +2,7 @@
 
 Backend API menggunakan Laravel Lumen untuk project Hamim.
 
-## Progress Development - 27 Oktober 2025
+## Progress Development - 28 Oktober 2025
 
 ### ✅ Yang Sudah Dikerjakan
 
@@ -15,17 +15,19 @@ Backend API menggunakan Laravel Lumen untuk project Hamim.
 #### 2. **User Authentication System**
 - **Database:** Tabel `user` dengan fields:
   - id, name, email, password, phone_number, address, profile_picture
-  - email_verified_at, remember_token, timestamps
-- **Model:** User model dengan auto password hashing
+  - firebase_uid, avatar, email_verified_at, remember_token, timestamps
+- **Model:** User model dengan auto password hashing & Sanctum HasApiTokens
 - **API Endpoints:**
-  - `POST /api/auth/register` - Register user baru
-  - `POST /api/auth/login` - Login dengan email/password
+  - `POST /api/auth/register` - Register user baru (Sanctum token)
+  - `POST /api/auth/login` - Login dengan email/password (Sanctum token)
+  - `POST /api/auth/firebase` - Social login via Firebase (Google/Facebook/Apple)
   - `POST /api/auth/logout` - Logout user
 - **Features:**
   - Email & phone unique validation
   - Password auto-hash saat register
-  - Token-based authentication
-  - Proper error handling
+  - **Laravel Sanctum** - API token management
+  - **Firebase Auth** - Social login (Google, Facebook, Apple, dll)
+  - Proper error handling & token verification
 
 #### 3. **Asset Management System**
 - **Database:** Tabel `assets` dengan fields:
@@ -51,6 +53,9 @@ Backend API menggunakan Laravel Lumen untuk project Hamim.
 - **Configuration:** Filesystem config untuk file upload
 
 #### 5. **Dependencies Installed**
+- `laravel/sanctum` - API authentication
+- `firebase/php-jwt` - Firebase token verification
+- `guzzlehttp/guzzle` - HTTP client for Firebase API
 - `league/flysystem` - File system abstraction
 - Standard Lumen packages
 
@@ -67,8 +72,24 @@ CREATE TABLE user (
     phone_number VARCHAR(25) UNIQUE,
     address VARCHAR(255) NULL,
     profile_picture VARCHAR(500) NULL,
+    firebase_uid VARCHAR(255) UNIQUE NULL,
+    avatar VARCHAR(500) NULL,
     email_verified_at TIMESTAMP NULL,
     remember_token VARCHAR(100) NULL,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+-- Sanctum API Tokens
+CREATE TABLE personal_access_tokens (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tokenable_type VARCHAR(255),
+    tokenable_id BIGINT,
+    name VARCHAR(255),
+    token VARCHAR(64) UNIQUE,
+    abilities TEXT NULL,
+    last_used_at TIMESTAMP NULL,
+    expires_at TIMESTAMP NULL,
     created_at TIMESTAMP,
     updated_at TIMESTAMP
 );
@@ -102,8 +123,10 @@ CREATE TABLE assets (
 ### 🚀 Ready for Frontend
 
 **Authentication:**
-- Register/Login/Logout API ready
-- Token-based auth system
+- **Regular Auth:** Register/Login dengan email/password
+- **Social Auth:** Firebase Auth (Google, Facebook, Apple, dll)
+- **API Tokens:** Laravel Sanctum untuk semua API calls
+- **Unified System:** Semua auth method return Sanctum token
 - User data management
 
 **Asset Management:**
@@ -125,13 +148,16 @@ CREATE TABLE assets (
 - [ ] API rate limiting
 - [ ] Email verification
 - [ ] Password reset
+- [ ] Firebase project setup & configuration
+- [ ] Frontend Firebase SDK integration
 
 ### 🔗 API Endpoints Summary
 
 #### Auth
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
+- `POST /api/auth/register` - Email/password registration
+- `POST /api/auth/login` - Email/password login
+- `POST /api/auth/firebase` - Social login (Google/Facebook/Apple)
+- `POST /api/auth/logout` - Logout user
 
 #### Assets
 - `GET /api/assets`
@@ -147,4 +173,9 @@ CREATE TABLE assets (
 - **Storage:** Local filesystem with public access
 
 ---
-**Status:** ✅ Ready for Frontend Integration
+### 📚 Documentation
+- `README.md` - Project overview & progress
+- `FIREBASE_SETUP.md` - Complete Firebase Auth setup guide
+
+---
+**Status:** ✅ Ready for Frontend Integration with Firebase Auth

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -23,7 +23,7 @@ class AuthController extends Controller
             'name', 'email', 'password', 'phone_number'
         ]));
 
-        $token = bin2hex(random_bytes(40));
+        $token = $user->createToken('auth-token')->plainTextToken;
         
         return response()->json([
             'message' => 'User registered successfully',
@@ -47,7 +47,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = bin2hex(random_bytes(40));
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
@@ -63,67 +63,35 @@ class AuthController extends Controller
         ]);
     }
 
-    public function googleLogin(Request $request)
+    public function firebaseLogin(Request $request)
     {
         $this->validate($request, [
-            'token' => 'required|string'
+            'idToken' => 'required|string'
         ]);
 
         try {
-            $googleUser = Socialite::driver('google')->userFromToken($request->token);
+            $firebaseService = new FirebaseService();
+            $firebaseUser = $firebaseService->verifyIdToken($request->idToken);
             
             $user = User::updateOrCreate([
-                'email' => $googleUser->email
+                'email' => $firebaseUser['email']
             ], [
-                'name' => $googleUser->name,
-                'google_id' => $googleUser->id,
-                'avatar' => $googleUser->avatar,
-                'email' => $googleUser->email
+                'name' => $firebaseUser['name'],
+                'firebase_uid' => $firebaseUser['uid'],
+                'avatar' => $firebaseUser['picture'],
+                'email' => $firebaseUser['email']
             ]);
 
             $token = $user->createToken('auth-token')->plainTextToken;
 
             return response()->json([
-                'message' => 'Google login successful',
+                'message' => 'Firebase login successful',
                 'user' => $user,
                 'token' => $token
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Google login failed',
-                'error' => $e->getMessage()
-            ], 400);
-        }
-    }
-
-    public function facebookLogin(Request $request)
-    {
-        $this->validate($request, [
-            'token' => 'required|string'
-        ]);
-
-        try {
-            $facebookUser = Socialite::driver('facebook')->userFromToken($request->token);
-            
-            $user = User::updateOrCreate([
-                'email' => $facebookUser->email
-            ], [
-                'name' => $facebookUser->name,
-                'facebook_id' => $facebookUser->id,
-                'avatar' => $facebookUser->avatar,
-                'email' => $facebookUser->email
-            ]);
-
-            $token = $user->createToken('auth-token')->plainTextToken;
-
-            return response()->json([
-                'message' => 'Facebook login successful',
-                'user' => $user,
-                'token' => $token
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Facebook login failed',
+                'message' => 'Firebase login failed',
                 'error' => $e->getMessage()
             ], 400);
         }

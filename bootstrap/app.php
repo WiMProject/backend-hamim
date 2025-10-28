@@ -61,7 +61,6 @@ $app->singleton(
 
 $app->configure('app');
 $app->configure('filesystems');
-$app->configure('services');
 
 /*
 |--------------------------------------------------------------------------

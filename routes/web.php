@@ -22,8 +22,7 @@ $router->group(['prefix' => 'api/auth'], function () use ($router) {
     $router->post('register', 'AuthController@register');
     $router->post('login', 'AuthController@login');
     $router->post('logout', 'AuthController@logout');
-    $router->post('google', 'AuthController@googleLogin');
-    $router->post('facebook', 'AuthController@facebookLogin');
+    $router->post('firebase', 'AuthController@firebaseLogin');
 });
 
 // Asset routes
