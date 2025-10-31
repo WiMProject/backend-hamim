@@ -44,6 +44,7 @@ Backend API menggunakan Laravel Lumen untuk project Hamim.
   - `GET /api/assets/{id}` - Get single asset
   - `GET /api/assets?type=image` - Filter by type
   - `GET /api/assets?category=banner` - Filter by category
+  - `GET /api/translations/{language}` - Get translation content (id/en/ar)
 - **Auto Metadata Detection:**
   - **Images:** Width, height (PNG/JPG/SVG)
   - **Lottie:** Width, height, frame rate, total frames
@@ -160,6 +161,7 @@ CREATE TABLE assets (
 - ✅ **Dual input methods** - File upload & direct JSON creation
 - ✅ **Complete asset system** - Images, audio, video, animations, translations
 - ✅ **Smart filtering** - Advanced query capabilities
+- ✅ **Translation GET endpoints** - Frontend-ready translation consumption
 - ✅ **Production ready** - All asset types supported with metadata
 
 ### 📝 Next Steps (Future)
@@ -187,7 +189,14 @@ CREATE TABLE assets (
 - `GET /api/assets/{id}` - Get single asset
 - `POST /api/assets/upload` - Upload any file type
 - `POST /api/assets/translations` - Create translation from JSON
+- `GET /api/assets/translations` - Get all translations
+- `GET /api/assets/translations/{language}` - Get translation content by language
 - `GET /storage/assets/{filename}` - Direct file access
+
+#### Translations (Alternative endpoints)
+- `GET /api/translations` - Get all translations
+- `GET /api/translations/{language}` - Get translation content by language (id/en/ar)
+- `POST /api/translations` - Create translation from JSON
 
 ### 💻 Development Environment
 - **Framework:** Laravel Lumen

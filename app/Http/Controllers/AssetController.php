@@ -42,6 +42,44 @@ class AssetController extends Controller
         ]);
     }
 
+    public function getTranslations(Request $request)
+    {
+        $query = Asset::where('type', 'translation')->where('is_active', true);
+        
+        if ($request->has('language')) {
+            $query->whereJsonContains('metadata->language', $request->language);
+        }
+        
+        $translations = $query->orderBy('created_at', 'desc')->get();
+        
+        return response()->json([
+            'message' => 'Translations retrieved successfully',
+            'data' => $translations
+        ]);
+    }
+
+    public function getTranslationContent($language)
+    {
+        $translation = Asset::where('type', 'translation')
+            ->where('is_active', true)
+            ->whereJsonContains('metadata->language', $language)
+            ->latest()
+            ->first();
+        
+        if (!$translation) {
+            return response()->json(['message' => 'Translation not found'], 404);
+        }
+        
+        $content = Storage::disk('public')->get($translation->file_path);
+        $translations = json_decode($content, true);
+        
+        return response()->json([
+            'message' => 'Translation content retrieved successfully',
+            'language' => $language,
+            'data' => $translations
+        ]);
+    }
+
     public function createTranslation(Request $request)
     {
         $this->validate($request, [

@@ -30,7 +30,16 @@ $router->group(['prefix' => 'api/assets'], function () use ($router) {
     $router->get('/', 'AssetController@index');
     $router->post('/upload', 'AssetController@upload');
     $router->post('/translations', 'AssetController@createTranslation');
+    $router->get('/translations', 'AssetController@getTranslations');
+    $router->get('/translations/{language}', 'AssetController@getTranslationContent');
     $router->get('/{id}', 'AssetController@show');
+});
+
+// Translation routes (alternative endpoints)
+$router->group(['prefix' => 'api/translations'], function () use ($router) {
+    $router->get('/', 'AssetController@getTranslations');
+    $router->get('/{language}', 'AssetController@getTranslationContent');
+    $router->post('/', 'AssetController@createTranslation');
 });
 
 // File serving routes
