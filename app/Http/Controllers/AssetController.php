@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AssetController extends Controller
 {
@@ -41,6 +42,44 @@ class AssetController extends Controller
         ]);
     }
 
+    public function createTranslation(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'language' => 'required|string|max:10', // id, en, ar
+            'translations' => 'required|array'
+        ]);
+
+        // Convert array to JSON string
+        $jsonContent = json_encode($request->translations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        
+        // Save as file
+        $filename = $request->language . '_' . time() . '.json';
+        $path = 'assets/' . $filename;
+        
+        Storage::disk('public')->put($path, $jsonContent);
+        
+        $asset = Asset::create([
+            'name' => $request->name,
+            'type' => 'translation',
+            'category' => 'language',
+            'file_path' => $path,
+            'file_url' => url('storage/' . $path),
+            'file_size' => strlen($jsonContent),
+            'mime_type' => 'application/json',
+            'metadata' => [
+                'format' => 'translation',
+                'language' => $request->language,
+                'keys_count' => count($request->translations)
+            ]
+        ]);
+
+        return response()->json([
+            'message' => 'Translation created successfully',
+            'data' => $asset
+        ], 201);
+    }
+
     public function upload(Request $request)
     {
         $this->validate($request, [
@@ -74,12 +113,59 @@ class AssetController extends Controller
     private function getFileMetadata($file)
     {
         $metadata = [];
+        $mimeType = $file->getMimeType();
         
-        if (str_starts_with($file->getMimeType(), 'image/')) {
+        // Image metadata
+        if (str_starts_with($mimeType, 'image/')) {
             $imageSize = getimagesize($file->getPathname());
             if ($imageSize) {
                 $metadata['width'] = $imageSize[0];
                 $metadata['height'] = $imageSize[1];
+            }
+        }
+        
+        // Lottie JSON metadata
+        if ($mimeType === 'application/json') {
+            $content = file_get_contents($file->getPathname());
+            $json = json_decode($content, true);
+            if ($json && isset($json['w'], $json['h'])) {
+                $metadata['width'] = $json['w'];
+                $metadata['height'] = $json['h'];
+                $metadata['format'] = 'lottie';
+                if (isset($json['fr'])) $metadata['frame_rate'] = $json['fr'];
+                if (isset($json['op'])) $metadata['frames'] = $json['op'];
+            }
+        }
+        
+        // Audio/Video metadata with getID3
+        if (str_starts_with($mimeType, 'audio/') || str_starts_with($mimeType, 'video/')) {
+            try {
+                $getID3 = new \getID3();
+                $fileInfo = $getID3->analyze($file->getPathname());
+                
+                if (isset($fileInfo['playtime_seconds'])) {
+                    $metadata['duration'] = round($fileInfo['playtime_seconds'], 2);
+                }
+                
+                if (str_starts_with($mimeType, 'audio/')) {
+                    $metadata['format'] = 'audio';
+                    if (isset($fileInfo['audio']['bitrate'])) {
+                        $metadata['bitrate'] = $fileInfo['audio']['bitrate'];
+                    }
+                    if (isset($fileInfo['audio']['sample_rate'])) {
+                        $metadata['sample_rate'] = $fileInfo['audio']['sample_rate'];
+                    }
+                }
+                
+                if (str_starts_with($mimeType, 'video/')) {
+                    $metadata['format'] = 'video';
+                    if (isset($fileInfo['video']['resolution_x'], $fileInfo['video']['resolution_y'])) {
+                        $metadata['width'] = $fileInfo['video']['resolution_x'];
+                        $metadata['height'] = $fileInfo['video']['resolution_y'];
+                    }
+                }
+            } catch (\Exception $e) {
+                $metadata['format'] = str_starts_with($mimeType, 'audio/') ? 'audio' : 'video';
             }
         }
         

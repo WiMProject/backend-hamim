@@ -29,6 +29,7 @@ $router->group(['prefix' => 'api/auth'], function () use ($router) {
 $router->group(['prefix' => 'api/assets'], function () use ($router) {
     $router->get('/', 'AssetController@index');
     $router->post('/upload', 'AssetController@upload');
+    $router->post('/translations', 'AssetController@createTranslation');
     $router->get('/{id}', 'AssetController@show');
 });
 
