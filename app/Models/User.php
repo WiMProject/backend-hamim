@@ -10,32 +10,54 @@ use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use Laravel\Sanctum\HasApiTokens;
 
+/**
+ * User Model
+ * 
+ * Represents a user in the system with authentication capabilities
+ */
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory, HasApiTokens;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'user';
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var string[]
+     * @var array<string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'phone_number', 'address', 'profile_picture', 'firebase_uid', 'avatar'
+        'name', 
+        'email', 
+        'password', 
+        'phone_number', 
+        'address', 
+        'profile_picture', 
+        'firebase_uid', 
+        'avatar', 
+        'remember_token'
     ];
 
     /**
-     * The attributes excluded from the model's JSON form.
+     * The attributes that should be hidden for serialization.
      *
-     * @var string[]
+     * @var array<string>
      */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     /**
      * Automatically hash password when setting
+     *
+     * @param string $value
+     * @return void
      */
     public function setPasswordAttribute($value)
     {

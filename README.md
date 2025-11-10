@@ -2,7 +2,32 @@
 
 Backend API menggunakan Laravel Lumen untuk project Hamim.
 
-## Progress Development - 28 Oktober 2025 (Updated)
+## Project Overview
+
+Backend API untuk aplikasi mobile Duolingo Islam yang menyediakan sistem authentication, asset management, dan multi-language support. Dibangun menggunakan Laravel Lumen dengan fokus pada performa dan skalabilitas.
+
+## Development Timeline
+
+### Phase 1: Initial Setup (27 Oktober 2025)
+- Project initialization dengan Laravel Lumen
+- Database setup dan konfigurasi MySQL
+- Basic authentication system dengan Sanctum
+- User registration dan login endpoints
+
+### Phase 2: Asset Management (28 Oktober 2025)
+- Enhanced asset management system
+- Multi-file type support (images, audio, video, animations)
+- Automatic metadata detection dengan getID3
+- Translation system dengan JSON assets
+- File serving dan storage optimization
+
+### Phase 3: Profile Management (10 November 2025)
+- Complete user profile CRUD operations
+- Password management (change, forgot, reset)
+- API structure optimization
+- Comprehensive testing dan debugging
+
+## Progress Development - Updated 10 November 2025
 
 ### ✅ Yang Sudah Dikerjakan
 
@@ -71,7 +96,7 @@ Backend API menggunakan Laravel Lumen untuk project Hamim.
 - `james-heinrich/getid3` - Audio/video metadata extraction
 - Standard Lumen packages
 
-### 🔧 Technical Details
+### Technical Details
 
 #### **Database Schema:**
 ```sql
@@ -132,7 +157,7 @@ CREATE TABLE assets (
 }
 ```
 
-### 🚀 Ready for Frontend
+### Ready for Frontend
 
 **Authentication:**
 - **Regular Auth:** Register/Login dengan email/password
@@ -154,37 +179,69 @@ CREATE TABLE assets (
 - Public access via `/storage/assets/`
 - Support multiple file types
 
-### 🎯 Today's Achievements (28 Oktober 2025)
-- ✅ **Enhanced metadata detection** - Auto-extract info from all file types
-- ✅ **getID3 integration** - Accurate audio/video duration & quality
-- ✅ **Multi-language support** - Translation management via assets
-- ✅ **Dual input methods** - File upload & direct JSON creation
-- ✅ **Complete asset system** - Images, audio, video, animations, translations
-- ✅ **Smart filtering** - Advanced query capabilities
-- ✅ **Translation GET endpoints** - Frontend-ready translation consumption
-- ✅ **Production ready** - All asset types supported with metadata
+### Today's Achievements (28 Oktober 2025)
+- **Enhanced metadata detection** - Auto-extract info from all file types
+- **getID3 integration** - Accurate audio/video duration & quality
+- **Multi-language support** - Translation management via assets
+- **Dual input methods** - File upload & direct JSON creation
+- **Complete asset system** - Images, audio, video, animations, translations
+- **Smart filtering** - Advanced query capabilities
+- **Translation GET endpoints** - Frontend-ready translation consumption
+- **Profile management** - Update profile, change password, forgot password
+- **API security** - Protected endpoints with Sanctum middleware
+- **Production ready** - Complete user & asset management system
 
-### 📝 Next Steps (Future)
-- [ ] User profile update API
+### Latest Updates (10 November 2025)
+- **Profile Management System** - Complete user profile CRUD operations
+- **Password Management** - Change password, forgot password, reset password
+- **ProfileController** - Dedicated controller for profile operations
+- **Authentication Enhancement** - Token-based profile access with Sanctum
+- **Password Reset Flow** - Email-based password reset with secure tokens
+- **API Structure Optimization** - Clean separation between auth and profile endpoints
+- **Database Model Fix** - Added remember_token to fillable fields for password reset
+- **Flexible Password Confirmation** - Optional password confirmation for register endpoint
+- **Clean Code Implementation** - Added proper documentation, removed code duplication
+- **Complete Testing** - All profile and password management endpoints tested and working
+
+### Technical Issues Resolved (10 November 2025)
+- **Sanctum Middleware Compatibility** - Fixed Lumen compatibility issues with Sanctum ServiceProvider
+- **Token Authentication** - Resolved token validation using PersonalAccessToken::findToken() method
+- **Mass Assignment Protection** - Fixed remember_token not being fillable in User model
+- **Password Reset Token Storage** - Resolved token not saving to database issue
+- **API Route Structure** - Optimized route organization for better maintainability
+- **Code Quality** - Added PHPDoc comments, removed duplication, improved readability
+- **Security Enhancement** - Hidden sensitive fields from JSON responses
+- **Debug & Testing** - Comprehensive debugging and testing of all endpoints
+
+### Next Steps (Future)
 - [ ] Asset delete/update endpoints
 - [ ] Image resize/compression
 - [ ] File access permissions
 - [ ] API rate limiting
 - [ ] Email verification
-- [ ] Password reset
+- [ ] Email service for password reset (currently returns token in response for testing)
 - [ ] Firebase project setup & configuration
 - [ ] Frontend Firebase SDK integration
 - [ ] Admin panel for asset management
+- [ ] User logout with token deletion
+- [ ] Profile picture upload endpoint
 
-### 🔗 API Endpoints Summary
+### API Endpoints Summary
 
 #### Auth
-- `POST /api/auth/register` - Email/password registration
+- `POST /api/auth/register` - Email/password registration (optional password confirmation)
 - `POST /api/auth/login` - Email/password login
 - `POST /api/auth/firebase` - Social login (Google/Facebook/Apple)
 - `POST /api/auth/logout` - Logout user
+- `POST /api/auth/forgot-password` - Send password reset token
+- `POST /api/auth/reset-password` - Reset password with token (requires confirmation)
+- `POST /api/auth/change-password` - Change password (protected, requires confirmation)
 
-#### Assets
+#### Profile (Protected)
+- `GET /api/profile` - Get user profile
+- `PUT /api/profile` - Update profile (name, phone, address, picture)
+
+#### Assets (Protected)
 - `GET /api/assets` - List all assets with filtering
 - `GET /api/assets/{id}` - Get single asset
 - `POST /api/assets/upload` - Upload any file type
@@ -193,22 +250,143 @@ CREATE TABLE assets (
 - `GET /api/assets/translations/{language}` - Get translation content by language
 - `GET /storage/assets/{filename}` - Direct file access
 
-#### Translations (Alternative endpoints)
+#### Translations (Protected)
 - `GET /api/translations` - Get all translations
 - `GET /api/translations/{language}` - Get translation content by language (id/en/ar)
 - `POST /api/translations` - Create translation from JSON
 
-### 💻 Development Environment
-- **Framework:** Laravel Lumen
-- **Database:** MySQL
-- **Server:** Laravel Valet
+### Development Environment
+- **Framework:** Laravel Lumen 10.x
+- **Database:** MySQL 8.0
+- **Server:** Laravel Valet (local development)
+- **Domain:** `backend-hamim.test`
+- **Storage:** Local filesystem dengan public access
+- **Authentication:** Laravel Sanctum API tokens
+- **Version Control:** Git dengan GitHub repository
+
+### Installation & Setup
+
+1. **Clone Repository**
+   ```bash
+   git clone https://github.com/WiMProject/backend-hamim.git
+   cd backend-hamim
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   composer install
+   ```
+
+3. **Environment Configuration**
+   ```bash
+   cp .env.example .env
+   # Configure database dan Firebase settings
+   ```
+
+4. **Database Setup**
+   ```bash
+   php artisan migrate
+   php artisan db:seed
+   ```
+
+5. **Storage Link**
+   ```bash
+   php artisan storage:link
+   ```
+
+6. **Start Development Server**
+   ```bash
+   # Using Valet
+   valet link backend-hamim
+   # Or using built-in server
+   php -S localhost:8000 -t public
+   ```
+
+### API Testing
+
+Gunakan Postman atau tools serupa untuk testing API endpoints. Contoh authentication flow:
+
+1. **Register/Login** untuk mendapatkan token
+2. **Set Authorization Header**: `Bearer {your_token}`
+3. **Test protected endpoints** seperti profile dan assets
+
+#### Password Confirmation Rules
+- **Register**: Optional - validates only if `password_confirmation` field is provided
+- **Reset Password**: Required - must include `password_confirmation`
+- **Change Password**: Required - must include `new_password_confirmation`
+
+#### Example Register Requests
+```json
+// Without confirmation (matches UI mockup)
+{
+    "name": "Hana Sari",
+    "email": "hana@example.com",
+    "password": "hana123456",
+    "phone_number": "081234567890"
+}
+
+// With confirmation (extra validation)
+{
+    "name": "Hana Sari",
+    "email": "hana@example.com",
+    "password": "hana123456",
+    "password_confirmation": "hana123456",
+    "phone_number": "081234567890"
+}
+```
+
+### File Structure
+
+```
+backend-hamim/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── AuthController.php
+│   │   ├── ProfileController.php
+│   │   └── AssetController.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   └── Asset.php
+│   └── Services/
+│       └── FirebaseService.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── routes/
+│   └── web.php
+├── storage/
+│   └── app/public/assets/
+└── public/
+    └── storage/ (symlink)
+```*Server:** Laravel Valet
 - **Domain:** `backend-hamim.test`
 - **Storage:** Local filesystem with public access
 
 ---
-### 📚 Documentation
-- `README.md` - Project overview & progress
+
+### Documentation Files
+- `README.md` - Project overview, progress, dan API documentation
 - `FIREBASE_SETUP.md` - Complete Firebase Auth setup guide
+- API Collection tersedia untuk Postman testing
+
+### Contributing
+
+1. Fork repository
+2. Create feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -am 'Add new feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Create Pull Request
+
+### Security
+
+- Semua password di-hash menggunakan bcrypt
+- API endpoints protected dengan Sanctum tokens
+- Input validation pada semua endpoints
+- CORS configuration untuk frontend integration
+- Rate limiting akan ditambahkan di future updates
 
 ---
-**Status:** ✅ Ready for Frontend Integration with Firebase Auth
+
+**Current Status:** Ready for Frontend Integration
+**Last Updated:** 10 November 2025
+**Version:** 1.0.0

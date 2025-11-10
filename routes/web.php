@@ -23,6 +23,15 @@ $router->group(['prefix' => 'api/auth'], function () use ($router) {
     $router->post('login', 'AuthController@login');
     $router->post('logout', 'AuthController@logout');
     $router->post('firebase', 'AuthController@firebaseLogin');
+    $router->post('forgot-password', 'AuthController@forgotPassword');
+    $router->post('reset-password', 'AuthController@resetPassword');
+    $router->post('change-password', 'AuthController@changePassword');
+});
+
+// Profile routes
+$router->group(['prefix' => 'api/profile'], function () use ($router) {
+    $router->get('/', 'ProfileController@show');
+    $router->put('/', 'ProfileController@update');
 });
 
 // Asset routes
